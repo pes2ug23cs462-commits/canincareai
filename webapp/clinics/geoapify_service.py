@@ -7,6 +7,7 @@ import requests
 from django.conf import settings
 
 REVERSE_GEOCODE_URL = "https://api.geoapify.com/v1/geocode/reverse"
+GEOCODE_SEARCH_URL = "https://api.geoapify.com/v1/geocode/search"
 REQUEST_TIMEOUT_SEC = 15
 
 
@@ -55,4 +56,44 @@ def reverse_geocode(lat, lng):
         "city": city,
         "state": state,
         "country": place.get("country"),
+    }
+
+
+def forward_geocode(text):
+    """Turn a typed place / area / city name into coordinates.
+
+    Returns a dict with `lat`, `lng` and `formatted` (full address),
+    or None if the place could not be found. Lets users search by
+    place name instead of entering latitude / longitude themselves.
+    """
+    api_key = settings.GEOAPIFY_API_KEY
+    if not api_key or not text:
+        return None
+
+    try:
+        resp = requests.get(
+            GEOCODE_SEARCH_URL,
+            params={"text": text, "apiKey": api_key, "format": "json", "limit": 1},
+            timeout=REQUEST_TIMEOUT_SEC,
+        )
+    except requests.RequestException:
+        return None
+
+    if resp.status_code != 200:
+        return None
+
+    results = resp.json().get("results") or []
+    if not results:
+        return None
+
+    place = results[0]
+    lat = place.get("lat")
+    lng = place.get("lon")
+    if lat is None or lng is None:
+        return None
+
+    return {
+        "lat": lat,
+        "lng": lng,
+        "formatted": place.get("formatted", text),
     }

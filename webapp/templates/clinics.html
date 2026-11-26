@@ -36,6 +36,13 @@
         <button type="button" id="searchCoordBtn" class="btn btn-outline-secondary btn-sm w-100">
           <i class="bi bi-search"></i> Search These Coordinates
         </button>
+
+        <div class="text-center my-3 small text-muted">&mdash; or just type your area &mdash;</div>
+        <label class="form-label small">Enter your area / city</label>
+        <input type="text" class="form-control form-control-sm mb-2" id="areaInput" placeholder="e.g. Vijayapura, Karnataka">
+        <button type="button" id="searchAreaBtn" class="btn ccai-btn-primary text-white btn-sm w-100">
+          <i class="bi bi-geo-alt"></i> Find Clinics in This Area
+        </button>
       </div>
 
       <div id="resultCard" class="ccai-card mt-4 d-none">
@@ -160,6 +167,52 @@ document.getElementById('searchCoordBtn').addEventListener('click', () => {
   const lat = parseFloat(latInput.value), lng = parseFloat(lngInput.value);
   if (isNaN(lat) || isNaN(lng)) { alert('Enter both latitude and longitude.'); return; }
   resolveLocation(lat, lng);
+});
+
+const areaInput = document.getElementById('areaInput');
+
+async function searchArea(area) {
+  errorCard.classList.add('d-none');
+  resultCard.classList.add('d-none');
+  setLocatePulse(true);
+  setStatus('Finding your area...', area);
+
+  try {
+    const resp = await fetch("{% url 'clinics:area_api' %}", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+      body: JSON.stringify({ area: area }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      showError('Area not found', data.error || 'Try adding the state or a nearby city.');
+      return;
+    }
+
+    latInput.value = data.latitude;
+    lngInput.value = data.longitude;
+    document.getElementById('resAddress').textContent = data.address;
+    document.getElementById('resLat').textContent = `Lat ${data.latitude}`;
+    document.getElementById('resLng').textContent = `Lng ${data.longitude}`;
+    document.getElementById('openMapsBtn').href = data.google_maps;
+    resultCard.classList.remove('d-none');
+    setStatus('Location found!', data.address);
+    setLocatePulse(false);
+
+    window.open(data.google_maps, '_blank');
+  } catch (e) {
+    showError('Connection error', 'Could not reach the server. Please try again.');
+  }
+}
+
+document.getElementById('searchAreaBtn').addEventListener('click', () => {
+  const area = areaInput.value.trim();
+  if (!area) { alert('Please enter your area or city.'); return; }
+  searchArea(area);
+});
+
+areaInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('searchAreaBtn').click(); }
 });
 
 // 3D "location pin over a spinning globe" animation.

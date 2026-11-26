@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
-from .geoapify_service import reverse_geocode
+from .geoapify_service import reverse_geocode, forward_geocode
 
 
 @login_required
@@ -39,5 +39,38 @@ def location_api(request):
         "latitude": lat,
         "longitude": lng,
         "address": address,
+        "google_maps": maps_url,
+    })
+
+
+@login_required
+@require_POST
+@csrf_protect
+def area_api(request):
+    """Turn a typed area / city name into coordinates and a clinic search link,
+    so users don't have to know their latitude and longitude."""
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    area = (payload.get("area") or "").strip()
+    if not area:
+        return JsonResponse({"error": "Please enter an area or city."}, status=400)
+
+    geo = forward_geocode(area)
+    if not geo:
+        return JsonResponse(
+            {"error": "Could not find that place. Try adding the state, or a nearby city."},
+            status=404,
+        )
+
+    lat, lng = geo["lat"], geo["lng"]
+    maps_url = f"https://www.google.com/maps/search/pet+clinic/@{lat},{lng},14z"
+
+    return JsonResponse({
+        "latitude": lat,
+        "longitude": lng,
+        "address": geo["formatted"],
         "google_maps": maps_url,
     })
