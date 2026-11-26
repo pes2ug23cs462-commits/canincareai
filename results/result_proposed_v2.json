@@ -1,0 +1,10 @@
+{
+  "model": "Proposed Model V2",
+  "accuracy": 0.9376443418013857,
+  "precision": 0.9204072597380605,
+  "recall": 0.9392699525658047,
+  "f1_score": 0.9281959242475447,
+  "train_time_sec": 1091.9428372383118,
+  "total_params": 2388870,
+  "trainable_params": 1051078
+}

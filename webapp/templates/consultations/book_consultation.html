@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Book {{ doctor.display_name }} - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-page-header">
+  <div class="ccai-container">
+    <span class="ccai-hero-badge mb-3 d-inline-block">BOOK A CONSULTATION</span>
+    <h1 class="mb-2">Consult {{ doctor.display_name }}</h1>
+    <p>{{ doctor.specialization }} &middot; {{ doctor.experience_years }} years experience &middot; {{ doctor.city }}</p>
+  </div>
+</div>
+
+<div class="ccai-container">
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+
+        {% if prediction %}
+        <div class="ccai-predict-banner mb-4">
+          <div class="ccai-predict-banner-icon"><i class="bi bi-magic"></i></div>
+          <div class="flex-grow-1">
+            <div class="small fw-semibold text-uppercase" style="letter-spacing:.05em; opacity:.85;">Pre-filled from your AI screening</div>
+            <h5 class="mb-1">{{ prediction.display_name }} &middot; {{ prediction.confidence }}% confidence</h5>
+            <p class="mb-0 small">{{ prediction.description|truncatewords:28 }}</p>
+          </div>
+          {% if prediction.image_url %}
+          <img src="{{ prediction.image_url }}" class="ccai-predict-thumb flex-shrink-0" alt="Screened image">
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="ccai-card mb-4">
+          <h5 class="ccai-section-title mb-3"><i class="bi bi-person"></i> Your details</h5>
+          <div class="row g-3">
+            <div class="col-md-4">{{ form.owner_name.label_tag }}{{ form.owner_name }}{{ form.owner_name.errors }}</div>
+            <div class="col-md-4">{{ form.contact_phone.label_tag }}{{ form.contact_phone }}{{ form.contact_phone.errors }}</div>
+            <div class="col-md-4">{{ form.contact_email.label_tag }}{{ form.contact_email }}{{ form.contact_email.errors }}</div>
+          </div>
+        </div>
+
+        <div class="ccai-card mb-4">
+          <h5 class="ccai-section-title mb-3"><i class="bi bi-heart"></i> About your dog</h5>
+          <div class="row g-3">
+            <div class="col-md-4">{{ form.pet_name.label_tag }}{{ form.pet_name }}{{ form.pet_name.errors }}</div>
+            <div class="col-md-4">{{ form.pet_breed.label_tag }}{{ form.pet_breed }}{{ form.pet_breed.errors }}</div>
+            <div class="col-md-4">{{ form.pet_age.label_tag }}{{ form.pet_age }}{{ form.pet_age.errors }}</div>
+          </div>
+        </div>
+
+        <div class="ccai-card mb-4">
+          <h5 class="ccai-section-title mb-3"><i class="bi bi-clipboard2-pulse"></i> Condition</h5>
+          <div class="row g-3">
+            <div class="col-12">
+              {{ form.predicted_disease.label_tag }}{{ form.predicted_disease }}{{ form.predicted_disease.errors }}
+              <div class="form-text">
+                {% if prediction %}Defaulted to the model's prediction. Change it if you disagree.
+                {% else %}Not sure? Leave it as-is &mdash; the vet will assess in person.{% endif %}
+              </div>
+            </div>
+            <div class="col-12">{{ form.symptoms_noted.label_tag }}{{ form.symptoms_noted }}{{ form.symptoms_noted.errors }}</div>
+          </div>
+        </div>
+
+        <div class="ccai-card">
+          <h5 class="ccai-section-title mb-3"><i class="bi bi-calendar-event"></i> Preferred appointment</h5>
+          <div class="row g-3">
+            <div class="col-md-4">{{ form.consultation_mode.label_tag }}{{ form.consultation_mode }}{{ form.consultation_mode.errors }}</div>
+            <div class="col-md-4">{{ form.preferred_date.label_tag }}{{ form.preferred_date }}{{ form.preferred_date.errors }}</div>
+            <div class="col-md-4">{{ form.preferred_time.label_tag }}{{ form.preferred_time }}{{ form.preferred_time.errors }}</div>
+            <div class="col-12">{{ form.notes.label_tag }}{{ form.notes }}{{ form.notes.errors }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="ccai-card mb-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            {% if doctor.photo %}
+              <img src="{{ doctor.photo.url }}" class="ccai-doc-photo" alt="{{ doctor.display_name }}">
+            {% else %}
+              <div class="ccai-doc-photo ccai-doc-initials">{{ doctor.initials }}</div>
+            {% endif %}
+            <div>
+              <div class="fw-bold">{{ doctor.display_name }}</div>
+              <div class="small text-muted">{{ doctor.specialization }}</div>
+            </div>
+          </div>
+          <ul class="ccai-doc-meta">
+            <li><i class="bi bi-award"></i> {{ doctor.experience_years }} years experience</li>
+            <li><i class="bi bi-geo-alt"></i> {{ doctor.city }}{% if doctor.clinic_name %} &middot; {{ doctor.clinic_name }}{% endif %}</li>
+            <li><i class="bi bi-clock"></i> {{ doctor.availability_text }}</li>
+            <li><i class="bi bi-cash-coin"></i> &#8377;{{ doctor.consultation_fee|floatformat:0 }} per consultation</li>
+          </ul>
+        </div>
+
+        <button type="submit" class="btn ccai-btn-primary text-white w-100 mb-2">
+          <i class="bi bi-send"></i> Request consultation
+        </button>
+        <a href="{% url 'consultations:doctors' %}" class="btn btn-outline-secondary w-100">Choose a different doctor</a>
+
+        <p class="ccai-disclaimer mt-3 mb-0">
+          The AI screening is a decision-support aid, not a diagnosis. Your request is reviewed by the clinic before it is confirmed.
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Do not let owners pick a date in the past.
+  const dateField = document.querySelector('input[name="preferred_date"]');
+  if (dateField) { dateField.min = "{{ today }}"; }
+</script>
+
+{% endblock %}

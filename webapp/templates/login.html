@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Sign In - CanineCare AI{% endblock %}
+{# messages are rendered inside the auth card below #}
+{% block messages %}{% endblock %}
+{% block content %}
+<div class="ccai-auth-wrap">
+  <div class="col-lg-6 d-none d-lg-flex ccai-auth-hero">
+    <div id="heroUser" {% if role == 'admin' %}hidden{% endif %}>
+      <span class="ccai-hero-badge">🐾 AI-POWERED PET HEALTH</span>
+      <h1>CanineCare <span style="color:#5eead4">AI</span></h1>
+      <p class="fs-5 mb-4">Screen dog skin conditions in seconds with a transfer-learning model trained on real veterinary image data.</p>
+      <div class="ccai-auth-feature"><i class="bi bi-camera2"></i><div>Upload a photo and get an instant AI-assisted screening result.</div></div>
+      <div class="ccai-auth-feature"><i class="bi bi-graph-up-arrow"></i><div>Transparent model performance &mdash; every metric is from a real experiment.</div></div>
+      <div class="ccai-auth-feature"><i class="bi bi-chat-heart"></i><div>Ask the built-in pet health assistant about symptoms and care.</div></div>
+    </div>
+    <div id="heroAdmin" {% if role != 'admin' %}hidden{% endif %}>
+      <span class="ccai-hero-badge">🔒 ADMIN PORTAL</span>
+      <h1>Clinic <span style="color:#5eead4">Control</span></h1>
+      <p class="fs-5 mb-4">Manage the veterinary doctor directory and respond to consultation requests raised by pet owners.</p>
+      <div class="ccai-auth-feature"><i class="bi bi-person-badge"></i><div>Add and maintain doctor profiles, experience, places and fees.</div></div>
+      <div class="ccai-auth-feature"><i class="bi bi-bell"></i><div>Get highlighted notifications the moment a consultation is booked.</div></div>
+      <div class="ccai-auth-feature"><i class="bi bi-calendar-check"></i><div>Confirm, complete or cancel bookings and reply to the owner.</div></div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 ccai-auth-form-side">
+    <div class="ccai-auth-card">
+      <h2 class="mb-1" id="authTitle">{% if role == 'admin' %}Admin sign in{% else %}Welcome back{% endif %}</h2>
+      <p class="text-muted mb-3" id="authSub">
+        {% if role == 'admin' %}Sign in to the CanineCare AI admin portal{% else %}Sign in to your CanineCare AI account{% endif %}
+      </p>
+
+      <div class="ccai-role-tabs mb-4" role="tablist">
+        <button type="button" class="ccai-role-tab {% if role != 'admin' %}active{% endif %}" data-role="user">
+          <i class="bi bi-person-heart"></i> Pet Owner
+        </button>
+        <button type="button" class="ccai-role-tab {% if role == 'admin' %}active{% endif %}" data-role="admin">
+          <i class="bi bi-shield-lock"></i> Admin
+        </button>
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} py-2 small">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate id="loginForm">
+        {% csrf_token %}
+        <input type="hidden" name="role" id="roleInput" value="{{ role }}">
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.identifier.label }}</label>
+          {{ form.identifier }}
+          {% if form.identifier.errors %}<div class="text-danger small mt-1">{{ form.identifier.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">{{ form.password.label }}</label>
+          {{ form.password }}
+          {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="form-check">
+            {{ form.remember_me }}
+            <label class="form-check-label small" for="id_remember_me">Remember me</label>
+          </div>
+          <a href="{% url 'accounts:forgot_password' %}" class="small">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn ccai-btn-primary text-white w-100" id="submitBtn">
+          {% if role == 'admin' %}<i class="bi bi-shield-lock"></i> Sign In to Admin Portal{% else %}Sign In{% endif %}
+        </button>
+      </form>
+
+      <p class="text-center small text-muted mt-4 mb-0" id="signupHint" {% if role == 'admin' %}hidden{% endif %}>
+        Don't have an account? <a href="{% url 'accounts:register' %}">Create one</a>
+      </p>
+      <p class="text-center small text-muted mt-4 mb-0" id="adminHint" {% if role != 'admin' %}hidden{% endif %}>
+        Admin accounts are created by the system administrator
+        (<code>manage.py createsuperuser</code>), not through sign-up.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Switch the sign-in card between the pet-owner and admin portals.
+(function () {
+  const tabs = document.querySelectorAll('.ccai-role-tab');
+  const roleInput = document.getElementById('roleInput');
+  const title = document.getElementById('authTitle');
+  const sub = document.getElementById('authSub');
+  const btn = document.getElementById('submitBtn');
+  const card = document.querySelector('.ccai-auth-card');
+
+  const copy = {
+    user: {
+      title: 'Welcome back',
+      sub: 'Sign in to your CanineCare AI account',
+      btn: 'Sign In',
+    },
+    admin: {
+      title: 'Admin sign in',
+      sub: 'Sign in to the CanineCare AI admin portal',
+      btn: '<i class="bi bi-shield-lock"></i> Sign In to Admin Portal',
+    },
+  };
+
+  function setRole(role) {
+    roleInput.value = role;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.role === role));
+    title.textContent = copy[role].title;
+    sub.textContent = copy[role].sub;
+    btn.innerHTML = copy[role].btn;
+    card.classList.toggle('ccai-auth-admin', role === 'admin');
+    document.getElementById('heroUser').hidden = role === 'admin';
+    document.getElementById('heroAdmin').hidden = role !== 'admin';
+    document.getElementById('signupHint').hidden = role === 'admin';
+    document.getElementById('adminHint').hidden = role !== 'admin';
+    // Keep the mode in the URL so a refresh or a failed attempt stays put.
+    const url = new URL(window.location);
+    if (role === 'admin') { url.searchParams.set('role', 'admin'); } else { url.searchParams.delete('role'); }
+    window.history.replaceState({}, '', url);
+  }
+
+  tabs.forEach(tab => tab.addEventListener('click', () => setRole(tab.dataset.role)));
+  setRole(roleInput.value === 'admin' ? 'admin' : 'user');
+})();
+</script>
+{% endblock %}

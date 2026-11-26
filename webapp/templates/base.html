@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}CanineCare AI{% endblock %}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<nav class="navbar navbar-expand-lg ccai-navbar sticky-top">
+  <div class="ccai-container d-flex flex-wrap align-items-center">
+    <a class="navbar-brand ccai-brand" href="{% url 'dashboard:home' %}">
+      <img src="{% static 'images/brand/logo_dog.jpg' %}" class="ccai-brand-icon" alt=""> CanineCare <span class="ccai-brand-accent">AI</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto">
+        {% if user.is_staff %}
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'dataset' %}active{% endif %}" href="{% url 'dashboard:dataset' %}"><i class="bi bi-bar-chart"></i> Dataset</a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" href="{% url 'prediction:predict' %}"><i class="bi bi-camera"></i> Detect Disease</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'clinics' %}active{% endif %}" href="{% url 'clinics:clinics' %}"><i class="bi bi-geo-alt"></i> Pet Clinics</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.app_name == 'consultations' %}active{% endif %}" href="{% url 'consultations:doctors' %}"><i class="bi bi-person-badge"></i> Consult a Vet</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'chatbot' %}active{% endif %}" href="{% url 'chatbot:chatbot' %}"><i class="bi bi-chat-heart"></i> AI Assistant</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center">
+        {% if user.is_staff %}
+        <li class="nav-item dropdown">
+          <a class="nav-link ccai-bell-link {% if admin_new_consultation_count %}has-new{% endif %}" href="#" role="button" data-bs-toggle="dropdown" title="Consultation notifications">
+            <i class="bi bi-bell{% if admin_new_consultation_count %}-fill{% endif %}"></i>
+            {% if admin_new_consultation_count %}<span class="ccai-bell-badge">{{ admin_new_consultation_count }}</span>{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end ccai-bell-menu">
+            <li class="dropdown-header fw-bold">
+              {% if admin_new_consultation_count %}{{ admin_new_consultation_count }} new consultation request{{ admin_new_consultation_count|pluralize }}{% else %}No new consultation requests{% endif %}
+            </li>
+            {% for c in admin_new_consultations %}
+            <li>
+              <a class="dropdown-item ccai-bell-item" href="{% url 'manage:consultation_detail' c.pk %}">
+                <span class="fw-semibold">{{ c.pet_name }}</span> with {{ c.doctor.display_name }}
+                <span class="d-block small text-muted">{{ c.predicted_display_name|default:"No screening" }} &middot; {{ c.preferred_date|date:"d M Y" }}</span>
+              </a>
+            </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'manage:dashboard' %}"><i class="bi bi-shield-lock"></i> Open admin portal</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle ccai-user" href="#" role="button" data-bs-toggle="dropdown">
+            <span class="ccai-avatar">{{ user.username|slice:":1"|upper }}</span> {{ user.first_name|default:user.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'consultations:my_bookings' %}"><i class="bi bi-calendar-check"></i> My bookings</a></li>
+            {% if user.is_staff %}
+            <li><a class="dropdown-item" href="{% url 'manage:dashboard' %}"><i class="bi bi-shield-lock"></i> Admin portal
+              {% if admin_new_consultation_count %}<span class="badge text-bg-danger ms-1">{{ admin_new_consultation_count }}</span>{% endif %}</a></li>
+            {% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right"></i> Sign out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% elif public_nav %}
+<nav class="ccai-public-nav sticky-top">
+  <div class="ccai-container d-flex justify-content-between align-items-center">
+    <span class="ccai-brand"><img src="{% static 'images/brand/logo_dog.jpg' %}" class="ccai-brand-icon" alt=""> CanineCare <span class="ccai-brand-accent">AI</span></span>
+    <div class="d-flex gap-2">
+      <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm">Sign In</a>
+      <a href="{% url 'accounts:register' %}" class="btn ccai-btn-primary text-white btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+{% block messages %}
+{% if messages %}
+<div class="ccai-container pt-3">
+  {% for message in messages %}
+  <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show ccai-alert" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+{% if user.is_authenticated or public_nav %}
+<footer class="ccai-footer">
+  <div class="ccai-container">
+    <p class="mb-0"><strong>CanineCare AI</strong> &mdash; AI-assisted dog skin disease screening.</p>
+  </div>
+</footer>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

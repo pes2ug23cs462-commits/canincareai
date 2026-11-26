@@ -1,0 +1,90 @@
+{% extends "consultations/admin/base_admin.html" %}
+{% block admin_title %}Doctors{% endblock %}
+{% block admin_heading %}Doctor Profiles{% endblock %}
+{% block admin_sub %}Add, edit, hide or remove the veterinary doctors users can book.{% endblock %}
+
+{% block admin_content %}
+
+<div class="ccai-card mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Search</label>
+      <input type="text" name="q" value="{{ selected.q }}" class="form-control" placeholder="Name, city or specialization">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Visibility</label>
+      <select name="status" class="form-select">
+        <option value="">All profiles</option>
+        <option value="active" {% if selected.status == 'active' %}selected{% endif %}>Active only</option>
+        <option value="inactive" {% if selected.status == 'inactive' %}selected{% endif %}>Hidden only</option>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn ccai-btn-primary text-white flex-grow-1" type="submit"><i class="bi bi-search"></i> Filter</button>
+      <a href="{% url 'manage:doctor_add' %}" class="btn btn-outline-secondary"><i class="bi bi-plus-lg"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="ccai-card">
+  <div class="table-responsive">
+    <table class="table ccai-table align-middle mb-0">
+      <thead>
+        <tr><th>Doctor</th><th>Specialization</th><th>Experience</th><th>Place</th><th>Fee</th><th>Bookings</th><th>Status</th><th class="text-end">Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for d in doctors %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              {% if d.photo %}
+                <img src="{{ d.photo.url }}" class="ccai-doc-thumb" alt="{{ d.display_name }}">
+              {% else %}
+                <span class="ccai-avatar">{{ d.initials }}</span>
+              {% endif %}
+              <div>
+                <div class="fw-semibold">{{ d.display_name }}</div>
+                <div class="small text-muted">{{ d.qualification|default:"--" }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="small">{{ d.specialization }}</td>
+          <td><span class="badge text-bg-light border">{{ d.experience_years }} yr{{ d.experience_years|pluralize }}</span></td>
+          <td class="small">{{ d.city }}<br><span class="text-muted">{{ d.clinic_name|default:"" }}</span></td>
+          <td class="small">&#8377;{{ d.consultation_fee|floatformat:0 }}</td>
+          <td><span class="badge text-bg-light border">{{ d.booking_count }}</span></td>
+          <td>
+            {% if d.is_active %}<span class="badge text-bg-success">Active</span>
+            {% else %}<span class="badge text-bg-secondary">Hidden</span>{% endif %}
+          </td>
+          <td class="text-end">
+            <div class="d-flex gap-1 justify-content-end">
+              <a href="{% url 'manage:doctor_edit' d.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+              <form method="post" action="{% url 'manage:doctor_toggle' d.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-secondary" type="submit" title="{% if d.is_active %}Hide from users{% else %}Show to users{% endif %}">
+                  <i class="bi {% if d.is_active %}bi-eye-slash{% else %}bi-eye{% endif %}"></i>
+                </button>
+              </form>
+              <form method="post" action="{% url 'manage:doctor_delete' d.pk %}" onsubmit="return confirm('Remove {{ d.display_name|escapejs }} from the directory?');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8">
+          <div class="ccai-empty-state">
+            <i class="bi bi-person-plus fs-1 text-secondary"></i>
+            <p class="mb-2 mt-2">No doctors yet.</p>
+            <a href="{% url 'manage:doctor_add' %}" class="btn ccai-btn-primary text-white btn-sm">Add the first doctor</a>
+          </div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

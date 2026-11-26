@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{% block admin_title %}Admin Portal{% endblock %} - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-admin-header">
+  <div class="ccai-container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <span class="ccai-hero-badge d-inline-block mb-2" style="background:rgba(255,255,255,0.15); color:#fff;">
+          <i class="bi bi-shield-lock"></i> ADMIN PORTAL
+        </span>
+        <h1 class="mb-1">{% block admin_heading %}Admin Portal{% endblock %}</h1>
+        <p class="mb-0">{% block admin_sub %}Manage veterinary doctors and consultation requests.{% endblock %}</p>
+      </div>
+      <div class="text-end">
+        <a href="{% url 'manage:consultations' %}?new=1" class="ccai-admin-bell {% if admin_new_consultation_count %}has-new{% endif %}">
+          <i class="bi bi-bell-fill"></i>
+          <span>{{ admin_new_consultation_count|default:0 }} new</span>
+        </a>
+      </div>
+    </div>
+
+    <ul class="ccai-admin-tabs mt-4">
+      <li><a href="{% url 'manage:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Overview</a></li>
+      <li><a href="{% url 'manage:doctors' %}" class="{% if request.resolver_match.url_name == 'doctors' or request.resolver_match.url_name == 'doctor_edit' %}active{% endif %}"><i class="bi bi-person-badge"></i> Doctors</a></li>
+      <li>
+        <a href="{% url 'manage:consultations' %}" class="{% if 'consultation' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-calendar-check"></i> Consultations
+          {% if admin_new_consultation_count %}<span class="ccai-nav-dot">{{ admin_new_consultation_count }}</span>{% endif %}
+        </a>
+      </li>
+      <li><a href="{% url 'manage:doctor_add' %}" class="{% if request.resolver_match.url_name == 'doctor_add' %}active{% endif %}"><i class="bi bi-plus-circle"></i> Add Doctor</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="ccai-container py-4">
+  {% if admin_new_consultation_count and request.resolver_match.url_name != 'consultation_detail' %}
+  <div class="ccai-notify-banner mb-4">
+    <div class="ccai-notify-icon"><i class="bi bi-bell-fill"></i></div>
+    <div class="flex-grow-1">
+      <h6 class="mb-1">{{ admin_new_consultation_count }} new consultation request{{ admin_new_consultation_count|pluralize }} waiting for review</h6>
+      <p class="mb-0 small">
+        {% for c in admin_new_consultations %}
+          <span class="ccai-notify-chip">{{ c.pet_name }} &rarr; {{ c.doctor.display_name }}{% if c.predicted_display_name %} &middot; {{ c.predicted_display_name }}{% endif %}</span>
+        {% endfor %}
+      </p>
+    </div>
+    <div class="d-flex gap-2 flex-shrink-0">
+      <a href="{% url 'manage:consultations' %}?new=1" class="btn btn-light btn-sm fw-semibold">Review now</a>
+      <form method="post" action="{% url 'manage:mark_all_seen' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn btn-outline-light btn-sm" type="submit">Clear</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  {% block admin_content %}{% endblock %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "consultations/admin/base_admin.html" %}
+{% block admin_title %}Consultations{% endblock %}
+{% block admin_heading %}Consultation Requests{% endblock %}
+{% block admin_sub %}Every booking users raised, with the AI screening result attached.{% endblock %}
+
+{% block admin_content %}
+
+<div class="ccai-card mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <label class="form-label small fw-semibold">Search</label>
+      <input type="text" name="q" value="{{ selected.q }}" class="form-control" placeholder="Pet, owner, doctor or condition">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Status</label>
+      <select name="status" class="form-select">
+        <option value="">All statuses</option>
+        {% for value, label in statuses %}
+        <option value="{{ value }}" {% if selected.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <div class="form-check mt-4">
+        <input class="form-check-input" type="checkbox" name="new" value="1" id="newOnly" {% if selected.new %}checked{% endif %}>
+        <label class="form-check-label small" for="newOnly">Unread only {% if new_count %}({{ new_count }}){% endif %}</label>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <button class="btn ccai-btn-primary text-white w-100" type="submit"><i class="bi bi-funnel"></i> Apply</button>
+    </div>
+  </form>
+</div>
+
+<div class="ccai-card">
+  <div class="table-responsive">
+    <table class="table ccai-table align-middle mb-0">
+      <thead>
+        <tr><th></th><th>Pet / Owner</th><th>Doctor &amp; place</th><th>AI screening</th><th>Preferred slot</th><th>Status</th><th class="text-end"></th></tr>
+      </thead>
+      <tbody>
+        {% for c in consultations %}
+        <tr class="{% if c.is_new %}ccai-row-new{% endif %}">
+          <td>{% if c.is_new %}<span class="ccai-new-dot" title="New request"></span>{% endif %}</td>
+          <td>
+            <div class="fw-semibold">{{ c.pet_name }}{% if c.pet_breed %} <span class="small text-muted">&middot; {{ c.pet_breed }}</span>{% endif %}</div>
+            <div class="small text-muted">{{ c.owner_name }} &middot; {{ c.contact_phone }}</div>
+          </td>
+          <td class="small">{{ c.doctor.display_name }}<br><span class="text-muted">{{ c.doctor.city }} &middot; {{ c.get_consultation_mode_display }}</span></td>
+          <td>
+            {% if c.predicted_display_name %}
+              <span class="badge text-bg-light border">{{ c.predicted_display_name }}</span>
+              {% if c.predicted_confidence %}<div class="small text-muted">{{ c.predicted_confidence }}% confidence</div>{% endif %}
+            {% else %}<span class="small text-muted">Not screened</span>{% endif %}
+          </td>
+          <td class="small">{{ c.preferred_date|date:"d M Y" }}{% if c.preferred_time %}<br><span class="text-muted">{{ c.preferred_time|time:"h:i A" }}</span>{% endif %}</td>
+          <td><span class="badge text-bg-{{ c.status_css }}">{{ c.get_status_display }}</span></td>
+          <td class="text-end"><a href="{% url 'manage:consultation_detail' c.pk %}" class="btn btn-sm {% if c.is_new %}ccai-btn-primary text-white{% else %}btn-outline-secondary{% endif %}">Open</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">
+          <div class="ccai-empty-state">
+            <i class="bi bi-calendar-x fs-1 text-secondary"></i>
+            <p class="mb-0 mt-2">No consultations match this filter.</p>
+          </div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

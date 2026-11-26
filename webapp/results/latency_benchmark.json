@@ -1,0 +1,11 @@
+{
+  "device": "cuda",
+  "batch_size": 1,
+  "image_size": 224,
+  "latency_ms": {
+    "MobileNetV2": 11.64,
+    "ResNet50": 11.74,
+    "EfficientNetB0": 15.38,
+    "Proposed Model": 11.06
+  }
+}

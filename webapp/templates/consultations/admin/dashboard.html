@@ -1,0 +1,139 @@
+{% extends "consultations/admin/base_admin.html" %}
+{% block admin_title %}Overview{% endblock %}
+{% block admin_heading %}Admin Overview{% endblock %}
+{% block admin_sub %}Doctor directory and consultation activity at a glance.{% endblock %}
+
+{% block admin_content %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="ccai-stat-card">
+      <div class="ccai-stat-icon" style="background:rgba(15,118,110,0.12); color:var(--ccai-primary);"><i class="bi bi-person-badge"></i></div>
+      <div class="ccai-stat-value">{{ doctor_count }}</div>
+      <div class="ccai-stat-label">Doctors ({{ active_doctor_count }} active)</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="ccai-stat-card">
+      <div class="ccai-stat-icon" style="background:rgba(249,115,22,0.12); color:var(--ccai-accent);"><i class="bi bi-calendar-check"></i></div>
+      <div class="ccai-stat-value">{{ total_consultations }}</div>
+      <div class="ccai-stat-label">Total consultations</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="ccai-stat-card">
+      <div class="ccai-stat-icon" style="background:rgba(220,38,38,0.12); color:var(--ccai-danger);"><i class="bi bi-hourglass-split"></i></div>
+      <div class="ccai-stat-value">{{ pending_count }}</div>
+      <div class="ccai-stat-label">Pending review</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="ccai-stat-card">
+      <div class="ccai-stat-icon" style="background:rgba(22,163,74,0.12); color:var(--ccai-success);"><i class="bi bi-calendar-event"></i></div>
+      <div class="ccai-stat-value">{{ today_count }}</div>
+      <div class="ccai-stat-label">Scheduled for today</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="ccai-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="ccai-section-title mb-0">New consultation requests</h5>
+        {% if new_count %}<span class="badge text-bg-danger">{{ new_count }} unread</span>{% endif %}
+      </div>
+
+      {% if new_requests %}
+      <div class="table-responsive">
+        <table class="table ccai-table align-middle mb-0">
+          <thead><tr><th>Pet / Owner</th><th>Doctor</th><th>AI result</th><th>Preferred</th><th></th></tr></thead>
+          <tbody>
+            {% for c in new_requests %}
+            <tr class="ccai-row-new">
+              <td>
+                <span class="fw-semibold">{{ c.pet_name }}</span><br>
+                <span class="small text-muted">{{ c.owner_name }}</span>
+              </td>
+              <td>{{ c.doctor.display_name }}<br><span class="small text-muted">{{ c.doctor.city }}</span></td>
+              <td>
+                {% if c.predicted_display_name %}
+                  <span class="badge text-bg-light border">{{ c.predicted_display_name }}</span>
+                  {% if c.predicted_confidence %}<span class="small text-muted">{{ c.predicted_confidence }}%</span>{% endif %}
+                {% else %}<span class="small text-muted">Not screened</span>{% endif %}
+              </td>
+              <td class="small">{{ c.preferred_date }}{% if c.preferred_time %}<br>{{ c.preferred_time|time:"h:i A" }}{% endif %}</td>
+              <td class="text-end"><a href="{% url 'manage:consultation_detail' c.pk %}" class="btn btn-sm ccai-btn-primary text-white">Review</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="ccai-empty-state">
+        <i class="bi bi-check2-circle fs-1 text-success"></i>
+        <p class="mb-0 mt-2">No unread requests. Everything has been reviewed.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="ccai-card mt-4">
+      <h5 class="ccai-section-title mb-3">Recent activity</h5>
+      {% if recent %}
+      <div class="table-responsive">
+        <table class="table ccai-table align-middle mb-0">
+          <thead><tr><th>Booked</th><th>Pet</th><th>Doctor</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {% for c in recent %}
+            <tr>
+              <td class="small text-muted">{{ c.created_at|date:"d M Y, h:i A" }}</td>
+              <td class="fw-semibold">{{ c.pet_name }}</td>
+              <td>{{ c.doctor.display_name }}</td>
+              <td><span class="badge text-bg-{{ c.status_css }}">{{ c.get_status_display }}</span></td>
+              <td class="text-end"><a href="{% url 'manage:consultation_detail' c.pk %}" class="btn btn-sm btn-outline-secondary">Open</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted small mb-0">No consultations booked yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="ccai-card mb-4">
+      <h5 class="ccai-section-title mb-3">Status breakdown</h5>
+      <div class="d-flex justify-content-between py-2 border-bottom"><span>Pending</span><span class="fw-bold">{{ pending_count }}</span></div>
+      <div class="d-flex justify-content-between py-2 border-bottom"><span>Confirmed</span><span class="fw-bold">{{ confirmed_count }}</span></div>
+      <div class="d-flex justify-content-between py-2 border-bottom"><span>Completed</span><span class="fw-bold">{{ completed_count }}</span></div>
+      <div class="d-flex justify-content-between py-2"><span>Cancelled</span><span class="fw-bold">{{ cancelled_count }}</span></div>
+    </div>
+
+    <div class="ccai-card mb-4">
+      <h5 class="ccai-section-title mb-3">Most booked doctors</h5>
+      {% for d in top_doctors %}
+      <div class="d-flex align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+        <span class="ccai-avatar">{{ d.initials }}</span>
+        <div class="flex-grow-1">
+          <div class="fw-semibold small">{{ d.display_name }}</div>
+          <div class="small text-muted">{{ d.city }}</div>
+        </div>
+        <span class="badge text-bg-light border">{{ d.booking_count }}</span>
+      </div>
+      {% empty %}
+      <p class="text-muted small mb-0">No bookings yet.</p>
+      {% endfor %}
+    </div>
+
+    <div class="ccai-card">
+      <h5 class="ccai-section-title mb-3">Quick actions</h5>
+      <a href="{% url 'manage:doctor_add' %}" class="btn ccai-btn-primary text-white w-100 mb-2"><i class="bi bi-plus-circle"></i> Add a doctor</a>
+      <a href="{% url 'manage:doctors' %}" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-people"></i> Manage doctor profiles</a>
+      <a href="{% url 'manage:consultations' %}" class="btn btn-outline-secondary w-100"><i class="bi bi-list-check"></i> All consultations</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

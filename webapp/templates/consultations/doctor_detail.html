@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ doctor.display_name }} - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-container py-4">
+  <a href="{% url 'consultations:doctors' %}" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> Back to all doctors</a>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="ccai-card">
+        <div class="d-flex flex-wrap gap-3 align-items-start">
+          {% if doctor.photo %}
+            <img src="{{ doctor.photo.url }}" class="ccai-doc-photo-lg" alt="{{ doctor.display_name }}">
+          {% else %}
+            <div class="ccai-doc-photo-lg ccai-doc-initials">{{ doctor.initials }}</div>
+          {% endif %}
+          <div class="flex-grow-1">
+            <h2 class="fw-bold mb-1">{{ doctor.display_name }}</h2>
+            <p class="ccai-section-sub mb-2">{{ doctor.specialization }}{% if doctor.qualification %} &middot; {{ doctor.qualification }}{% endif %}</p>
+            <span class="ccai-exp-badge"><i class="bi bi-award"></i> {{ doctor.experience_years }} years of experience</span>
+          </div>
+        </div>
+
+        {% if doctor.bio %}
+        <hr>
+        <h6 class="fw-bold">About</h6>
+        <p class="text-muted mb-0">{{ doctor.bio }}</p>
+        {% endif %}
+
+        <hr>
+        <div class="row g-3 small">
+          <div class="col-md-6"><div class="text-muted">Clinic</div><div class="fw-semibold">{{ doctor.clinic_name|default:"Independent practice" }}</div></div>
+          <div class="col-md-6"><div class="text-muted">Place</div><div class="fw-semibold">{{ doctor.city }}</div></div>
+          <div class="col-md-6"><div class="text-muted">Availability</div><div class="fw-semibold">{{ doctor.availability_text }}</div></div>
+          <div class="col-md-6"><div class="text-muted">Consultation mode</div><div class="fw-semibold">{{ doctor.get_consultation_mode_display }}</div></div>
+          {% if doctor.languages %}<div class="col-md-6"><div class="text-muted">Languages</div><div class="fw-semibold">{{ doctor.languages }}</div></div>{% endif %}
+          {% if doctor.phone %}<div class="col-md-6"><div class="text-muted">Phone</div><div class="fw-semibold">{{ doctor.phone }}</div></div>{% endif %}
+          {% if doctor.address %}<div class="col-12"><div class="text-muted">Address</div><div class="fw-semibold">{{ doctor.address }}</div></div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="ccai-card mb-4">
+        <div class="text-center mb-3">
+          <div class="small text-muted">Consultation fee</div>
+          <div class="fw-bold" style="font-size:1.8rem; color:var(--ccai-primary-dark);">&#8377;{{ doctor.consultation_fee|floatformat:0 }}</div>
+        </div>
+        <a href="{% url 'consultations:book' doctor.pk %}" class="btn ccai-btn-primary text-white w-100">
+          <i class="bi bi-calendar-plus"></i> Book a consultation
+        </a>
+      </div>
+
+      {% if prediction %}
+      <div class="ccai-card">
+        <h6 class="fw-bold mb-2"><i class="bi bi-clipboard2-pulse text-primary"></i> Will be attached</h6>
+        <p class="small text-muted mb-2">Your latest screening result is carried into the booking form:</p>
+        <div class="fw-semibold">{{ prediction.display_name }}</div>
+        <div class="small text-muted">{{ prediction.confidence }}% confidence{% if prediction.severity %} &middot; {{ prediction.severity }}{% endif %}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}CanineCare AI - AI-Powered Dog Skin Disease Screening{% endblock %}
+{% block content %}
+
+<section class="ccai-intro-hero">
+  <div class="ccai-container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="ccai-hero-badge mb-3 d-inline-block">🐾 AI-POWERED PET HEALTH PLATFORM</span>
+        <h1 class="mb-3">Screen your dog's skin health in seconds, not days.</h1>
+        <p class="lead mb-4">CanineCare AI uses a trained computer-vision model to screen photos for common
+          dog skin conditions, then connects you with clear guidance and nearby veterinary care &mdash;
+          all backed by real, transparent model performance data.</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'accounts:register' %}" class="btn ccai-btn-primary text-white btn-lg px-4">
+            <i class="bi bi-rocket-takeoff"></i> Get Started Free
+          </a>
+          <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-lg px-4">Sign In</a>
+        </div>
+
+        <div class="ccai-intro-stats">
+          <div><div class="num">{{ stats.total_images }}</div><div class="label">Dataset Images</div></div>
+          <div><div class="num">{{ stats.num_classes }}</div><div class="label">Disease Classes</div></div>
+          <div><div class="num">{{ proposed_accuracy|floatformat:1 }}%</div><div class="label">Model Accuracy</div></div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="ccai-3d-stage ccai-hero-dog">
+          <img src="{% static 'images/brand/hero_dog.jpg' %}" alt="Happy beagle looking at the camera">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ccai-intro-section">
+  <div class="ccai-container">
+    <div class="text-center mb-5">
+      <h2 class="ccai-section-title fs-2">Everything you need in one place</h2>
+      <p class="ccai-section-sub mx-auto" style="max-width:560px;">From instant screening to finding a vet nearby, CanineCare AI brings together the tools pet owners actually need.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="ccai-feature-card">
+          <div class="ccai-feature-icon" style="background:#0f766e;"><i class="bi bi-camera"></i></div>
+          <h6 class="fw-bold mb-2">Instant AI Screening</h6>
+          <p class="small text-muted mb-0">Upload a photo and get a screening result with confidence scores in seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="ccai-feature-card">
+          <div class="ccai-feature-icon" style="background:#f97316;"><i class="bi bi-graph-up"></i></div>
+          <h6 class="fw-bold mb-2">Transparent Model Data</h6>
+          <p class="small text-muted mb-0">Every accuracy, precision and recall number comes from a real, documented experiment.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="ccai-feature-card">
+          <div class="ccai-feature-icon" style="background:#2563eb;"><i class="bi bi-geo-alt"></i></div>
+          <h6 class="fw-bold mb-2">Nearby Vet Finder</h6>
+          <p class="small text-muted mb-0">Quickly find veterinary clinics when a screening result suggests professional care.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="ccai-feature-card">
+          <div class="ccai-feature-icon" style="background:#9333ea;"><i class="bi bi-chat-heart"></i></div>
+          <h6 class="fw-bold mb-2">Pet Health Assistant</h6>
+          <p class="small text-muted mb-0">Ask a domain-restricted AI assistant about symptoms, prevention and care.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ccai-intro-section pt-0">
+  <div class="ccai-container">
+    <div class="ccai-intro-cta">
+      <h3 class="fw-bold mb-2">Ready to check on your dog's skin health?</h3>
+      <p class="mb-4 opacity-75">Create a free account and run your first AI screening in under a minute.</p>
+      <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4 fw-bold text-primary">Create Free Account</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

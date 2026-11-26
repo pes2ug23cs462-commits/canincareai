@@ -1,0 +1,55 @@
+{
+  "num_classes": 6,
+  "class_names": [
+    "Dermatitis",
+    "Fungal_infections",
+    "Healthy",
+    "Hypersensitivity",
+    "demodicosis",
+    "ringworm"
+  ],
+  "counts_per_class_split": {
+    "Dermatitis": {
+      "train": 546,
+      "valid": 175,
+      "test": 66
+    },
+    "Fungal_infections": {
+      "train": 375,
+      "valid": 97,
+      "test": 54
+    },
+    "Healthy": {
+      "train": 492,
+      "valid": 139,
+      "test": 69
+    },
+    "Hypersensitivity": {
+      "train": 230,
+      "valid": 63,
+      "test": 29
+    },
+    "demodicosis": {
+      "train": 588,
+      "valid": 174,
+      "test": 100
+    },
+    "ringworm": {
+      "train": 791,
+      "valid": 212,
+      "test": 115
+    }
+  },
+  "total_images": 4315,
+  "image_sizes_found": [
+    [
+      640,
+      640
+    ]
+  ],
+  "image_modes_found": [
+    "RGB"
+  ],
+  "num_corrupted_images": 0,
+  "corrupted_files": []
+}

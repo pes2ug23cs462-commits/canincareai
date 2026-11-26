@@ -1,0 +1,90 @@
+{% extends "consultations/admin/base_admin.html" %}
+{% block admin_title %}{% if doctor %}Edit Doctor{% else %}Add Doctor{% endif %}{% endblock %}
+{% block admin_heading %}{% if doctor %}Edit {{ doctor.display_name }}{% else %}Add a Doctor{% endif %}{% endblock %}
+{% block admin_sub %}These details are what users see when they browse and filter the consultation directory.{% endblock %}
+
+{% block admin_content %}
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <div class="ccai-card mb-4">
+        <h5 class="ccai-section-title mb-3"><i class="bi bi-person-badge"></i> Professional profile</h5>
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.full_name.label_tag }}{{ form.full_name }}{{ form.full_name.errors }}</div>
+          <div class="col-md-6">{{ form.specialization.label_tag }}{{ form.specialization }}{{ form.specialization.errors }}</div>
+          <div class="col-md-6">{{ form.qualification.label_tag }}{{ form.qualification }}{{ form.qualification.errors }}</div>
+          <div class="col-md-6">
+            {{ form.experience_years.label_tag }}{{ form.experience_years }}{{ form.experience_years.errors }}
+            <div class="form-text">Users filter the directory by this value.</div>
+          </div>
+          <div class="col-12">{{ form.bio.label_tag }}{{ form.bio }}{{ form.bio.errors }}</div>
+        </div>
+      </div>
+
+      <div class="ccai-card mb-4">
+        <h5 class="ccai-section-title mb-3"><i class="bi bi-geo-alt"></i> Where they consult</h5>
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.clinic_name.label_tag }}{{ form.clinic_name }}{{ form.clinic_name.errors }}</div>
+          <div class="col-md-6">
+            {{ form.city.label_tag }}{{ form.city }}{{ form.city.errors }}
+            <div class="form-text">Shown as a place filter on the user-facing list.</div>
+          </div>
+          <div class="col-12">{{ form.address.label_tag }}{{ form.address }}{{ form.address.errors }}</div>
+        </div>
+      </div>
+
+      <div class="ccai-card">
+        <h5 class="ccai-section-title mb-3"><i class="bi bi-clock-history"></i> Consultation &amp; availability</h5>
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.consultation_mode.label_tag }}{{ form.consultation_mode }}{{ form.consultation_mode.errors }}</div>
+          <div class="col-md-6">{{ form.consultation_fee.label_tag }}{{ form.consultation_fee }}{{ form.consultation_fee.errors }}</div>
+          <div class="col-md-6">{{ form.available_days.label_tag }}{{ form.available_days }}{{ form.available_days.errors }}</div>
+          <div class="col-md-6">{{ form.languages.label_tag }}{{ form.languages }}{{ form.languages.errors }}</div>
+          <div class="col-md-3">{{ form.available_from.label_tag }}{{ form.available_from }}{{ form.available_from.errors }}</div>
+          <div class="col-md-3">{{ form.available_to.label_tag }}{{ form.available_to }}{{ form.available_to.errors }}</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-lg-4">
+      <div class="ccai-card mb-4">
+        <h5 class="ccai-section-title mb-3"><i class="bi bi-telephone"></i> Contact</h5>
+        <div class="mb-3">{{ form.phone.label_tag }}{{ form.phone }}{{ form.phone.errors }}</div>
+        <div class="mb-3">{{ form.email.label_tag }}{{ form.email }}{{ form.email.errors }}</div>
+      </div>
+
+      <div class="ccai-card mb-4">
+        <h5 class="ccai-section-title mb-3"><i class="bi bi-image"></i> Photo</h5>
+        {% if doctor and doctor.photo %}
+          <img src="{{ doctor.photo.url }}" class="ccai-doc-photo mb-3" alt="{{ doctor.display_name }}">
+        {% endif %}
+        {{ form.photo }}{{ form.photo.errors }}
+        <div class="form-text">Optional. Users see initials if no photo is uploaded.</div>
+      </div>
+
+      <div class="ccai-card mb-4">
+        <div class="form-check">
+          {{ form.is_active }}
+          <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">Listed to users</label>
+        </div>
+        <div class="form-text">Uncheck to hide this profile without deleting it.</div>
+      </div>
+
+      <button type="submit" class="btn ccai-btn-primary text-white w-100 mb-2">
+        <i class="bi bi-check2"></i> {% if doctor %}Save changes{% else %}Add doctor{% endif %}
+      </button>
+      <a href="{% url 'manage:doctors' %}" class="btn btn-outline-secondary w-100">Cancel</a>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

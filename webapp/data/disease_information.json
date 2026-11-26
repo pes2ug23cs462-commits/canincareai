@@ -1,0 +1,230 @@
+{
+  "Dermatitis": {
+    "display_name": "Dermatitis (incl. Allergic / Hot Spots)",
+    "description": "Dermatitis is general inflammation of the skin. In dogs it is commonly linked to allergies (food, environmental, flea-bite) or self-trauma from licking, chewing, or scratching, and often appears as red, irritated, or moist patches ('hot spots').",
+    "symptoms": [
+      "Redness, swelling, or moist/oozing patches on the skin",
+      "Frequent licking, chewing, or scratching of one area",
+      "Hair loss or thinning around the affected patch",
+      "Unpleasant odor from the irritated area",
+      "Visible discomfort when the area is touched"
+    ],
+    "causes": [
+      "Allergic reactions (food, pollen, dust, fleas)",
+      "Skin irritation from moisture trapped in the coat",
+      "Insect bites or flea infestation",
+      "Repeated self-trauma from scratching/licking",
+      "Underlying skin sensitivity"
+    ],
+    "prevention": [
+      "Regular grooming and drying the coat after baths/swimming",
+      "Consistent flea and parasite control",
+      "Identifying and avoiding known allergy triggers where possible",
+      "Keeping the dog's living area clean",
+      "Prompt attention to minor scratches or irritation before they worsen"
+    ],
+    "recommended_care": [
+      "Keep the affected area clean and dry",
+      "Prevent further licking/scratching (e.g., a protective collar) if advised by a vet",
+      "Monitor for spreading or worsening of the patch",
+      "Avoid home application of human skin products without veterinary guidance"
+    ],
+    "treatment_information": [
+      "Veterinarians may recommend topical treatments, medicated shampoos, or anti-inflammatory/antibiotic medication depending on severity and cause",
+      "Treatment plans are typically tailored after an in-person examination"
+    ],
+    "when_to_visit_vet": [
+      "The patch is spreading, bleeding, or has an odor",
+      "The dog seems to be in significant discomfort or pain",
+      "No improvement within a few days of home hygiene care",
+      "Signs of infection (pus, heat, swelling)"
+    ],
+    "severity": "Mild to Moderate (can become serious if infected or left untreated)",
+    "warning": "This information is general and educational only. It is not a veterinary diagnosis. A veterinarian should evaluate the dog for an accurate diagnosis and treatment plan."
+  },
+  "Fungal_infections": {
+    "display_name": "Fungal Infections",
+    "description": "Fungal skin infections in dogs are caused by fungal organisms (distinct from ringworm, which is a specific dermatophyte fungal infection) affecting the skin, and can cause irritation, hair loss, and changes in skin texture.",
+    "symptoms": [
+      "Patchy hair loss",
+      "Flaky, scaly, or crusty skin",
+      "Itching or discomfort",
+      "Discoloration or thickened skin in affected areas",
+      "Unpleasant odor in some cases"
+    ],
+    "causes": [
+      "Exposure to fungal spores in soil or from other infected animals",
+      "Warm, moist environments that favor fungal growth",
+      "Weakened immune system or underlying skin conditions",
+      "Prolonged dampness of the coat/skin"
+    ],
+    "prevention": [
+      "Keep the dog's skin and coat clean and dry",
+      "Avoid prolonged contact with damp bedding or environments",
+      "Limit contact with animals known to have fungal infections",
+      "Routine grooming to catch early skin changes"
+    ],
+    "recommended_care": [
+      "Keep affected areas clean and dry",
+      "Avoid sharing bedding/grooming tools with other pets during an active infection",
+      "Monitor for spread to other parts of the body or to other household pets"
+    ],
+    "treatment_information": [
+      "Veterinarians may prescribe antifungal shampoos, topical treatments, or oral antifungal medication depending on severity",
+      "A confirmed diagnosis (e.g., skin scraping/culture) is typically needed before treatment"
+    ],
+    "when_to_visit_vet": [
+      "Hair loss or skin changes are spreading",
+      "The condition does not improve with basic hygiene care",
+      "Other pets or household members develop skin irritation",
+      "Signs of secondary bacterial infection appear"
+    ],
+    "severity": "Moderate (some fungal infections can be contagious to other animals/humans)",
+    "warning": "This information is general and educational only. It is not a veterinary diagnosis. A veterinarian should evaluate the dog for an accurate diagnosis and treatment plan."
+  },
+  "Healthy": {
+    "display_name": "Healthy Skin",
+    "description": "The image was classified as showing no visible signs of the skin disease categories in this dataset. This is a general screening result, not a clean bill of health.",
+    "symptoms": [
+      "No visible redness, hair loss, or lesions",
+      "Coat appears smooth and evenly distributed",
+      "No visible signs of irritation or discomfort"
+    ],
+    "causes": [],
+    "prevention": [
+      "Maintain a regular grooming routine",
+      "Ensure a balanced diet and regular parasite prevention",
+      "Schedule routine veterinary check-ups"
+    ],
+    "recommended_care": [
+      "Continue regular grooming and hygiene practices",
+      "Monitor the skin periodically for any new changes"
+    ],
+    "treatment_information": [],
+    "when_to_visit_vet": [
+      "Any new symptoms (itching, redness, hair loss) appear later",
+      "As part of routine annual/bi-annual veterinary wellness checks"
+    ],
+    "severity": "None detected",
+    "warning": "This is an AI-based screening result, not a veterinary diagnosis or a guarantee of overall health. Continue routine veterinary care."
+  },
+  "Hypersensitivity": {
+    "display_name": "Hypersensitivity (Allergic Reaction)",
+    "description": "Hypersensitivity reactions occur when a dog's immune system overreacts to a substance (allergen), leading to skin inflammation, itching, and irritation. Common triggers include fleas, food, and environmental allergens.",
+    "symptoms": [
+      "Intense itching or scratching",
+      "Redness or inflamed skin, often around the face, ears, paws, or belly",
+      "Recurrent skin or ear infections",
+      "Swelling in more severe reactions",
+      "Restlessness or discomfort"
+    ],
+    "causes": [
+      "Flea bites (flea allergy dermatitis)",
+      "Food ingredients",
+      "Environmental allergens (pollen, dust mites, mold)",
+      "Contact allergens (certain fabrics, cleaning products)"
+    ],
+    "prevention": [
+      "Consistent flea/parasite prevention",
+      "Identifying and avoiding known allergens where possible",
+      "Discussing diet trials with a veterinarian if food allergy is suspected",
+      "Keeping the living environment clean of common allergens"
+    ],
+    "recommended_care": [
+      "Reduce known/suspected allergen exposure",
+      "Keep the skin clean and avoid irritating products",
+      "Track flare-ups to help identify potential triggers"
+    ],
+    "treatment_information": [
+      "Veterinarians may recommend antihistamines, other allergy medications, dietary changes, or allergy testing depending on the case",
+      "Severe or recurrent hypersensitivity often benefits from a structured veterinary allergy work-up"
+    ],
+    "when_to_visit_vet": [
+      "Swelling of the face, lips, or throat (seek immediate veterinary attention)",
+      "Difficulty breathing",
+      "Frequent or worsening allergic flare-ups",
+      "Signs of a secondary skin or ear infection"
+    ],
+    "severity": "Moderate (severe allergic/anaphylactic reactions are a medical emergency)",
+    "warning": "This information is general and educational only. It is not a veterinary diagnosis. Facial swelling or breathing difficulty requires immediate veterinary attention."
+  },
+  "demodicosis": {
+    "display_name": "Demodicosis (Demodectic Mange)",
+    "description": "Demodicosis is caused by an overgrowth of Demodex mites, which naturally live in small numbers on most dogs' skin. When the immune system cannot keep the mite population in check, it can lead to hair loss and skin irritation, particularly in puppies or immunocompromised dogs.",
+    "symptoms": [
+      "Patchy hair loss, often starting around the face, eyes, or forelegs",
+      "Red, scaly, or crusty skin",
+      "Mild to moderate itching (can vary)",
+      "Skin may thicken or darken in chronic cases",
+      "Secondary bacterial infection in some cases"
+    ],
+    "causes": [
+      "Overpopulation of naturally occurring Demodex mites",
+      "Immature or weakened immune system (common in young puppies)",
+      "Underlying illness or immune suppression in adult dogs",
+      "Genetic predisposition in some breeds"
+    ],
+    "prevention": [
+      "Maintaining general health and a strong immune system through proper nutrition",
+      "Routine veterinary check-ups, especially for puppies",
+      "Prompt attention to unexplained hair loss or skin changes"
+    ],
+    "recommended_care": [
+      "Avoid sharing grooming tools during an active case",
+      "Keep the skin clean and monitor for spread",
+      "Follow the full course of any prescribed treatment"
+    ],
+    "treatment_information": [
+      "Veterinarians typically confirm diagnosis via skin scraping and may prescribe miticidal treatments, medicated shampoos, or oral medication",
+      "Localized cases in puppies often resolve with the immune system maturing, but should still be monitored by a vet"
+    ],
+    "when_to_visit_vet": [
+      "Hair loss is spreading or affecting large areas of the body",
+      "Signs of skin infection (odor, pus, significant redness)",
+      "The dog seems unwell beyond the skin symptoms",
+      "No improvement after initial home hygiene care"
+    ],
+    "severity": "Mild (localized) to Severe (generalized demodicosis)",
+    "warning": "This information is general and educational only. It is not a veterinary diagnosis. A veterinarian should confirm demodicosis with a skin scraping before treatment."
+  },
+  "ringworm": {
+    "display_name": "Ringworm (Dermatophytosis)",
+    "description": "Ringworm is not caused by a worm, but by a contagious fungal (dermatophyte) infection of the skin, hair, and nails. It commonly causes circular patches of hair loss and can spread to other pets and humans.",
+    "symptoms": [
+      "Circular or irregular patches of hair loss",
+      "Scaly, crusty, or reddened skin at the patch edges",
+      "Brittle hair around the affected area",
+      "Mild itching in some cases",
+      "Lesions may appear on the face, ears, paws, or elsewhere"
+    ],
+    "causes": [
+      "Contact with dermatophyte fungal spores",
+      "Contact with an infected animal or contaminated bedding/grooming tools",
+      "Contaminated soil in rare cases",
+      "Higher risk in puppies, senior dogs, or immunocompromised dogs"
+    ],
+    "prevention": [
+      "Avoid contact with known infected animals",
+      "Regularly clean and disinfect bedding, grooming tools, and living areas",
+      "Isolate an infected pet from other animals and wash hands after contact",
+      "Routine grooming to catch early skin changes"
+    ],
+    "recommended_care": [
+      "Limit contact between the affected dog and other pets/children during treatment",
+      "Disinfect shared surfaces, bedding, and grooming tools",
+      "Follow the complete treatment course even if symptoms improve early"
+    ],
+    "treatment_information": [
+      "Veterinarians may prescribe topical antifungal treatments, medicated shampoos, or oral antifungal medication depending on severity",
+      "Diagnosis is typically confirmed via fungal culture or specialized examination"
+    ],
+    "when_to_visit_vet": [
+      "Circular hair loss patches are spreading",
+      "Other pets or household members develop similar skin lesions",
+      "No improvement with hygiene measures",
+      "The dog is a puppy, senior, or has a known weakened immune system"
+    ],
+    "severity": "Moderate (highly contagious to other animals and humans - zoonotic)",
+    "warning": "This information is general and educational only. It is not a veterinary diagnosis. Ringworm is contagious to humans; consult a veterinarian and, if needed, a physician for guidance."
+  }
+}

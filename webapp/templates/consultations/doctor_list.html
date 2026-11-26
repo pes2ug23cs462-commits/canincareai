@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Consult a Vet - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-page-header">
+  <div class="ccai-container">
+    <span class="ccai-hero-badge mb-3 d-inline-block">VETERINARY CONSULTATION</span>
+    <h1 class="mb-2">Consult a Verified Vet</h1>
+    <p>Browse {{ total_active }} doctor{{ total_active|pluralize }} by years of experience and the place you can consult at,
+       then book with your screening result already filled in.</p>
+  </div>
+</div>
+
+<div class="ccai-container">
+
+  {% if prediction %}
+  <div class="ccai-predict-banner mb-4">
+    <div class="ccai-predict-banner-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+    <div class="flex-grow-1">
+      <div class="small fw-semibold text-uppercase" style="letter-spacing:.05em; opacity:.85;">Your latest screening</div>
+      <h5 class="mb-1">{{ prediction.display_name }} <span class="fw-normal">&middot; {{ prediction.confidence }}% confidence</span></h5>
+      <p class="mb-0 small">This result and its symptom notes will be pre-filled on the booking form. You can change them before submitting.</p>
+    </div>
+    <a href="{% url 'prediction:predict' %}" class="btn btn-light btn-sm fw-semibold flex-shrink-0">Re-scan</a>
+  </div>
+  {% else %}
+  <div class="alert alert-light border ccai-alert mb-4">
+    <i class="bi bi-lightbulb text-warning"></i>
+    Tip: run a <a href="{% url 'prediction:predict' %}" class="fw-semibold">skin screening</a> first &mdash; the predicted condition
+    and its details are then filled into the booking form automatically.
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="ccai-card ccai-filter-card">
+        <h6 class="fw-bold mb-3"><i class="bi bi-funnel"></i> Filter doctors</h6>
+        <form method="get">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Search</label>
+            <input type="text" name="q" value="{{ selected.q }}" class="form-control form-control-sm" placeholder="Name, clinic or place">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Experience</label>
+            <select name="experience" class="form-select form-select-sm">
+              {% for value, label in experience_filters %}
+              <option value="{{ value }}" {% if selected.experience == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Place</label>
+            <select name="city" class="form-select form-select-sm">
+              <option value="">All places</option>
+              {% for c in cities %}
+              <option value="{{ c }}" {% if selected.city == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Consultation mode</label>
+            <select name="mode" class="form-select form-select-sm">
+              <option value="">Any mode</option>
+              {% for value, label in modes %}
+                {% if value != 'both' %}
+                <option value="{{ value }}" {% if selected.mode == value %}selected{% endif %}>{{ label }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Sort by</label>
+            <select name="sort" class="form-select form-select-sm">
+              <option value="experience" {% if selected.sort == 'experience' %}selected{% endif %}>Most experienced</option>
+              <option value="fee" {% if selected.sort == 'fee' %}selected{% endif %}>Lowest fee</option>
+              <option value="name" {% if selected.sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+            </select>
+          </div>
+
+          <button class="btn ccai-btn-primary text-white w-100 btn-sm mb-2" type="submit"><i class="bi bi-search"></i> Apply filters</button>
+          <a href="{% url 'consultations:doctors' %}" class="btn btn-outline-secondary w-100 btn-sm">Reset</a>
+        </form>
+      </div>
+
+      <div class="ccai-card mt-3">
+        <h6 class="fw-bold mb-2"><i class="bi bi-calendar-check"></i> Your bookings</h6>
+        <p class="small text-muted mb-2">Track the status of consultations you have already requested.</p>
+        <a href="{% url 'consultations:my_bookings' %}" class="btn btn-outline-secondary btn-sm w-100">View my bookings</a>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="ccai-section-sub mb-0">{{ doctors|length }} doctor{{ doctors|length|pluralize }} found</p>
+      </div>
+
+      <div class="row g-3">
+        {% for d in doctors %}
+        <div class="col-md-6">
+          <div class="ccai-doctor-card h-100">
+            <div class="d-flex gap-3 mb-3">
+              {% if d.photo %}
+                <img src="{{ d.photo.url }}" class="ccai-doc-photo" alt="{{ d.display_name }}">
+              {% else %}
+                <div class="ccai-doc-photo ccai-doc-initials">{{ d.initials }}</div>
+              {% endif %}
+              <div class="flex-grow-1">
+                <h5 class="mb-0">{{ d.display_name }}</h5>
+                <div class="small text-muted">{{ d.specialization }}</div>
+                {% if d.qualification %}<div class="small text-muted">{{ d.qualification }}</div>{% endif %}
+                <div class="mt-2">
+                  <span class="ccai-exp-badge"><i class="bi bi-award"></i> {{ d.experience_years }} yr{{ d.experience_years|pluralize }} experience</span>
+                </div>
+              </div>
+            </div>
+
+            <ul class="ccai-doc-meta">
+              <li><i class="bi bi-geo-alt"></i> {{ d.city }}{% if d.clinic_name %} &middot; {{ d.clinic_name }}{% endif %}</li>
+              <li><i class="bi bi-clock"></i> {{ d.availability_text }}</li>
+              <li><i class="bi bi-camera-video"></i> {{ d.get_consultation_mode_display }}</li>
+              {% if d.language_list %}<li><i class="bi bi-translate"></i> {{ d.languages }}</li>{% endif %}
+            </ul>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div>
+                <div class="small text-muted">Consultation fee</div>
+                <div class="fw-bold" style="color:var(--ccai-primary-dark);">&#8377;{{ d.consultation_fee|floatformat:0 }}</div>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="{% url 'consultations:doctor_detail' d.pk %}" class="btn btn-outline-secondary btn-sm">Profile</a>
+                <a href="{% url 'consultations:book' d.pk %}" class="btn ccai-btn-primary text-white btn-sm">Book</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="ccai-empty-state">
+            <i class="bi bi-person-x fs-1 text-secondary"></i>
+            <p class="mb-1 mt-2 fw-semibold">No doctors match these filters.</p>
+            <p class="small text-muted mb-0">Try widening the experience range or choosing a different place.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

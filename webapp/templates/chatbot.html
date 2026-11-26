@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-page-header">
+  <div class="ccai-container">
+    <span class="ccai-hero-badge mb-3 d-inline-block">PET DISEASE AI ASSISTANT</span>
+    <h1 class="mb-2">Ask About Pet Health</h1>
+    <p>A domain-restricted assistant for dog and pet disease questions, symptoms, prevention, and general veterinary care.</p>
+  </div>
+</div>
+
+<div class="ccai-container">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      {% if not configured %}
+      <div class="ccai-disclaimer mb-3">
+        <i class="bi bi-info-circle"></i>
+        The chatbot is not configured yet on this server. Add <code>GEMINI_API_KEY</code> to the
+        project's <code>.env</code> file to enable live responses.
+      </div>
+      {% endif %}
+
+      <div class="ccai-card">
+        <div id="chatWindow" class="ccai-chat-window mb-3">
+          <div class="ccai-chat-msg bot">
+            <div class="ccai-chat-bubble">
+              Hi! I'm the CanineCare AI Assistant. I can help with questions about dog and pet diseases,
+              symptoms, prevention, and general care. I'm not a veterinarian, so for anything serious,
+              please consult one. How can I help today?
+            </div>
+          </div>
+        </div>
+
+        <div class="ccai-chat-suggestions mb-2 d-flex flex-wrap gap-2">
+          <button class="btn btn-sm btn-outline-secondary suggestion-btn">What could cause red, itchy skin patches on my dog?</button>
+          <button class="btn btn-sm btn-outline-secondary suggestion-btn">How do I prevent ringworm from spreading to other pets?</button>
+          <button class="btn btn-sm btn-outline-secondary suggestion-btn">What does the app's "Hypersensitivity" prediction mean?</button>
+        </div>
+
+        <form id="chatForm" class="d-flex gap-2">
+          {% csrf_token %}
+          <input type="text" id="chatInput" class="form-control" placeholder="Ask about a pet health topic..." maxlength="1000" {% if not configured %}disabled{% endif %}>
+          <button type="submit" class="btn ccai-btn-primary text-white" id="chatSendBtn" {% if not configured %}disabled{% endif %}>
+            <i class="bi bi-send"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="ccai-card">
+        <h6 class="fw-bold mb-2"><i class="bi bi-shield-check text-primary"></i> What this assistant can help with</h6>
+        <ul class="small mb-0 ps-3">
+          <li>Dog and pet disease symptoms</li>
+          <li>Prevention and general care</li>
+          <li>Explaining this app's predictions</li>
+          <li>When to see a veterinarian</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chatWindow = document.getElementById('chatWindow');
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+
+function getCookie(name) {
+  const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return match ? match.pop() : '';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Minimal, safe markdown-ish renderer: escapes HTML first, then converts
+// **bold**, "- "/"1. " lists, "### " headings, and blank-line-separated paragraphs.
+function renderMarkdown(text) {
+  const escaped = escapeHtml(text).replace(/^#{1,6}\s+(.+)$/gm, '**$1**');
+  const blocks = escaped.split(/\n\s*\n/);
+  return blocks.map(block => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    const isBulletList = lines.length > 0 && lines.every(l => /^[-*]\s+/.test(l));
+    const isNumberedList = lines.length > 0 && lines.every(l => /^\d+[.)]\s+/.test(l));
+    let html;
+    if (isBulletList) {
+      html = '<ul>' + lines.map(l => `<li>${l.replace(/^[-*]\s+/, '')}</li>`).join('') + '</ul>';
+    } else if (isNumberedList) {
+      html = '<ol>' + lines.map(l => `<li>${l.replace(/^\d+[.)]\s+/, '')}</li>`).join('') + '</ol>';
+    } else {
+      html = `<p>${lines.join('<br>')}</p>`;
+    }
+    return html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }).join('');
+}
+
+function addMessage(text, role) {
+  const wrap = document.createElement('div');
+  wrap.className = `ccai-chat-msg ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'ccai-chat-bubble';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  chatWindow.appendChild(wrap);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  return bubble;
+}
+
+async function sendMessage(message) {
+  addMessage(message, 'user');
+  chatInput.value = '';
+  const typingBubble = addMessage('Thinking...', 'bot');
+  chatSendBtn.disabled = true;
+
+  try {
+    const resp = await fetch("{% url 'chatbot:chat_api' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({ message }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      typingBubble.innerHTML = renderMarkdown(data.reply);
+    } else {
+      typingBubble.textContent = data.error || 'Something went wrong. Please try again.';
+    }
+  } catch (e) {
+    typingBubble.textContent = 'Could not reach the assistant. Please try again.';
+  } finally {
+    chatSendBtn.disabled = false;
+  }
+}
+
+chatForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const message = chatInput.value.trim();
+  if (message) sendMessage(message);
+});
+
+document.querySelectorAll('.suggestion-btn').forEach(btn => {
+  btn.addEventListener('click', () => sendMessage(btn.textContent));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dataset Overview - CanineCare AI{% endblock %}
+{% block content %}
+
+<div class="ccai-page-header">
+  <div class="ccai-container">
+    <span class="ccai-hero-badge mb-3 d-inline-block">DATASET OVERVIEW</span>
+    <h1 class="mb-2">Training Dataset</h1>
+    <p>Actual statistics from the dataset used to train the CanineCare AI model &mdash; no placeholder numbers.</p>
+  </div>
+</div>
+
+<div class="ccai-container">
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="ccai-card ccai-stat-card h-100">
+        <div class="ccai-stat-icon"><i class="bi bi-images"></i></div>
+        <div><div class="ccai-stat-value">{{ stats.total_images }}</div><div class="ccai-stat-label">Total Images</div></div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="ccai-card ccai-stat-card h-100">
+        <div class="ccai-stat-icon"><i class="bi bi-tags"></i></div>
+        <div><div class="ccai-stat-value">{{ stats.num_classes }}</div><div class="ccai-stat-label">Disease Classes</div></div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="ccai-card ccai-stat-card h-100">
+        <div class="ccai-stat-icon"><i class="bi bi-aspect-ratio"></i></div>
+        <div><div class="ccai-stat-value">{{ image_size.0 }}&times;{{ image_size.1 }}</div><div class="ccai-stat-label">Image Resolution</div></div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="ccai-card ccai-stat-card h-100">
+        <div class="ccai-stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div><div class="ccai-stat-value">{{ stats.num_corrupted_images }}</div><div class="ccai-stat-label">Corrupted Images Found</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7">
+      <div class="ccai-card">
+        <h5 class="ccai-section-title">Class Distribution (Train / Valid / Test)</h5>
+        <div class="table-responsive">
+          <table class="table ccai-table">
+            <thead><tr><th>Class</th><th>Train</th><th>Valid</th><th>Test</th><th>Total</th></tr></thead>
+            <tbody>
+            {% for c in per_class %}
+              <tr>
+                <td class="fw-semibold">{{ c.name }}</td>
+                <td>{{ c.train }}</td>
+                <td>{{ c.valid }}</td>
+                <td>{{ c.test }}</td>
+                <td class="fw-bold">{{ c.total }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="ccai-card h-100">
+        <h5 class="ccai-section-title">Images per Class</h5>
+        <canvas id="classChart" height="230"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccai-card mb-4">
+    <h5 class="ccai-section-title">Sample Images from the Dataset</h5>
+    <img src="{% static 'images/sample_images.png' %}" class="img-fluid rounded" alt="Sample dataset images">
+  </div>
+
+  <div class="ccai-card mb-5">
+    <h5 class="ccai-section-title">Class Distribution Chart (Stage 1 analysis)</h5>
+    <img src="{% static 'images/class_distribution.png' %}" class="img-fluid rounded" alt="Class distribution chart">
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script id="chart-data" type="application/json">
+{
+  "labels": [{% for c in per_class %}"{{ c.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+  "totals": [{% for c in per_class %}{{ c.total }}{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+<script>
+const chartData = JSON.parse(document.getElementById('chart-data').textContent);
+new Chart(document.getElementById('classChart'), {
+  type: 'bar',
+  data: {
+    labels: chartData.labels,
+    datasets: [{
+      label: 'Total images',
+      data: chartData.totals,
+      backgroundColor: '#0f766e',
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+{% endblock %}

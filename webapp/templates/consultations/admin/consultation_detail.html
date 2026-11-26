@@ -1,0 +1,123 @@
+{% extends "consultations/admin/base_admin.html" %}
+{% block admin_title %}Consultation #{{ consultation.pk }}{% endblock %}
+{% block admin_heading %}Consultation #{{ consultation.pk }}{% endblock %}
+{% block admin_sub %}Raised {{ consultation.created_at|date:"d M Y, h:i A" }} by {{ consultation.user.username }}.{% endblock %}
+
+{% block admin_content %}
+
+{% if was_new %}
+<div class="ccai-notify-banner mb-4">
+  <div class="ccai-notify-icon"><i class="bi bi-bell-fill"></i></div>
+  <div class="flex-grow-1">
+    <h6 class="mb-1">New consultation request</h6>
+    <p class="mb-0 small">{{ consultation.owner_name }} booked {{ consultation.doctor.display_name }} for {{ consultation.pet_name }}. Opening it here has marked the notification as read.</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-8">
+
+    <div class="ccai-card mb-4">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <h5 class="ccai-section-title mb-0"><i class="bi bi-clipboard2-pulse"></i> Screening carried over</h5>
+        <span class="badge text-bg-{{ consultation.status_css }}">{{ consultation.get_status_display }}</span>
+      </div>
+
+      {% if consultation.predicted_display_name %}
+      <div class="row g-3 align-items-center">
+        <div class="col-md-7">
+          <div class="small text-muted fw-semibold">AI PREDICTED CONDITION</div>
+          <h4 class="fw-bold mb-1">{{ consultation.predicted_display_name }}</h4>
+          <div class="small text-muted mb-2">Model label: <code>{{ consultation.predicted_disease }}</code></div>
+          {% if consultation.predicted_severity %}
+          <span class="ccai-badge ccai-badge-moderate d-inline-block">Severity: {{ consultation.predicted_severity }}</span>
+          {% endif %}
+        </div>
+        {% if consultation.predicted_confidence %}
+        <div class="col-md-5 d-flex justify-content-center">
+          <div class="ccai-confidence-ring" style="--pct: {{ consultation.predicted_confidence }};">
+            <div class="val">{{ consultation.predicted_confidence }}%<small>Confidence</small></div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% if consultation.disease_summary %}
+      <p class="small text-muted mt-3 mb-0">{{ consultation.disease_summary }}</p>
+      {% endif %}
+      {% else %}
+      <p class="text-muted small mb-0">The owner did not attach a screening result to this booking.</p>
+      {% endif %}
+
+      {% if consultation.symptoms_noted %}
+      <hr>
+      <div class="small fw-semibold mb-1">Symptoms noted by the owner</div>
+      <p class="small text-muted mb-0" style="white-space: pre-line;">{{ consultation.symptoms_noted }}</p>
+      {% endif %}
+    </div>
+
+    <div class="ccai-card mb-4">
+      <h5 class="ccai-section-title mb-3"><i class="bi bi-heart"></i> Pet &amp; owner</h5>
+      <div class="row g-3 small">
+        <div class="col-md-4"><div class="text-muted">Pet name</div><div class="fw-semibold">{{ consultation.pet_name }}</div></div>
+        <div class="col-md-4"><div class="text-muted">Breed</div><div class="fw-semibold">{{ consultation.pet_breed|default:"--" }}</div></div>
+        <div class="col-md-4"><div class="text-muted">Age</div><div class="fw-semibold">{{ consultation.pet_age|default:"--" }}</div></div>
+        <div class="col-md-4"><div class="text-muted">Owner</div><div class="fw-semibold">{{ consultation.owner_name }}</div></div>
+        <div class="col-md-4"><div class="text-muted">Phone</div><div class="fw-semibold">{{ consultation.contact_phone }}</div></div>
+        <div class="col-md-4"><div class="text-muted">Email</div><div class="fw-semibold">{{ consultation.contact_email|default:"--" }}</div></div>
+      </div>
+      {% if consultation.notes %}
+      <hr>
+      <div class="small fw-semibold mb-1">Additional notes</div>
+      <p class="small text-muted mb-0" style="white-space: pre-line;">{{ consultation.notes }}</p>
+      {% endif %}
+    </div>
+
+    <div class="ccai-card">
+      <h5 class="ccai-section-title mb-3"><i class="bi bi-pencil-square"></i> Update this request</h5>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">{{ form.status.label_tag }}{{ form.status }}{{ form.status.errors }}</div>
+        <div class="mb-3">{{ form.admin_response.label_tag }}{{ form.admin_response }}{{ form.admin_response.errors }}</div>
+        <button type="submit" class="btn ccai-btn-primary text-white"><i class="bi bi-check2"></i> Save &amp; notify owner</button>
+        <a href="{% url 'manage:consultations' %}" class="btn btn-outline-secondary">Back to list</a>
+      </form>
+    </div>
+
+  </div>
+
+  <div class="col-lg-4">
+    <div class="ccai-card mb-4">
+      <h5 class="ccai-section-title mb-3"><i class="bi bi-calendar-event"></i> Requested slot</h5>
+      <div class="small">
+        <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Date</span><span class="fw-semibold">{{ consultation.preferred_date|date:"d M Y" }}</span></div>
+        <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Time</span><span class="fw-semibold">{% if consultation.preferred_time %}{{ consultation.preferred_time|time:"h:i A" }}{% else %}Any{% endif %}</span></div>
+        <div class="d-flex justify-content-between py-2"><span class="text-muted">Mode</span><span class="fw-semibold">{{ consultation.get_consultation_mode_display }}</span></div>
+      </div>
+    </div>
+
+    <div class="ccai-card">
+      <h5 class="ccai-section-title mb-3"><i class="bi bi-person-badge"></i> Assigned doctor</h5>
+      <div class="d-flex align-items-center gap-2 mb-3">
+        {% if consultation.doctor.photo %}
+          <img src="{{ consultation.doctor.photo.url }}" class="ccai-doc-thumb" alt="{{ consultation.doctor.display_name }}">
+        {% else %}
+          <span class="ccai-avatar">{{ consultation.doctor.initials }}</span>
+        {% endif %}
+        <div>
+          <div class="fw-semibold">{{ consultation.doctor.display_name }}</div>
+          <div class="small text-muted">{{ consultation.doctor.specialization }}</div>
+        </div>
+      </div>
+      <div class="small">
+        <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Experience</span><span class="fw-semibold">{{ consultation.doctor.experience_years }} yrs</span></div>
+        <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Place</span><span class="fw-semibold">{{ consultation.doctor.city }}</span></div>
+        <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Fee</span><span class="fw-semibold">&#8377;{{ consultation.doctor.consultation_fee|floatformat:0 }}</span></div>
+        <div class="d-flex justify-content-between py-2"><span class="text-muted">Phone</span><span class="fw-semibold">{{ consultation.doctor.phone|default:"--" }}</span></div>
+      </div>
+      <a href="{% url 'manage:doctor_edit' consultation.doctor.pk %}" class="btn btn-outline-secondary btn-sm w-100 mt-3">Open doctor profile</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

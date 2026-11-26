@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+env/
+.venv/
+
+# Django
+db.sqlite3
+*.log
+
+# Secrets
+.env
+*.env
+
+# Media uploads (user content)
+webapp/media/uploads/*
+!webapp/media/uploads/.gitkeep
+
+# Datasets / heavy artifacts
+Dataset/
+*.zip
+*.h5
+*.bak
+*.bak2
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
