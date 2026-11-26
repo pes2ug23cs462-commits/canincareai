@@ -1,3 +1,13 @@
+---
+title: CanineCare AI
+emoji: 🐕
+colorFrom: green
+colorTo: orange
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # CanineCare AI — AI-Based Dog Health Monitoring System
 
 Dog skin-disease screening from a photo, using a fine-tuned MobileNetV2 (93.76% accuracy,
