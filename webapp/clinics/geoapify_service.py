@@ -3,6 +3,7 @@ for the Nearby Pet Clinics page.
 
 Docs: https://apidocs.geoapify.com/docs/geocoding/reverse-geocoding/
 """
+import os
 import requests
 from django.conf import settings
 
@@ -73,7 +74,11 @@ def forward_geocode(text):
     try:
         resp = requests.get(
             GEOCODE_SEARCH_URL,
-            params={"text": text, "apiKey": api_key, "format": "json", "limit": 1},
+            params={
+                "text": text, "apiKey": api_key, "format": "json", "limit": 1,
+                # bias results to India so local area names (e.g. "Bommasandra") resolve correctly
+                "filter": os.environ.get("GEO_COUNTRY_FILTER", "countrycode:in"),
+            },
             timeout=REQUEST_TIMEOUT_SEC,
         )
     except requests.RequestException:
