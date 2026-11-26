@@ -24,7 +24,13 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-fallback-key-for-loca
 DEBUG = env_bool("DEBUG", True)
 
 ALLOWED_HOSTS = [
-    h.strip() for h in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()
+    h.strip() for h in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com,.hf.space").split(",") if h.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS", "https://*.onrender.com,https://*.hf.space"
+    ).split(",") if o.strip()
 ]
 
 # Project-level configuration read from .env (never hard-code secrets here).
@@ -64,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -126,6 +133,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
